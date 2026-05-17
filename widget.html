@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crypto Embeddable Price Card</title>
+  <!-- Outfit Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: transparent;
+      --card: rgba(15, 23, 42, 0.6);
+      --border: rgba(255, 255, 255, 0.08);
+      --accent: #00e5ff;
+      --text: #ffffff;
+      --muted: #94a3b8;
+      --success: #00ff88;
+      --danger: #ff3366;
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+      padding: 10px;
+    }
+    
+    .widget-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.25rem;
+      width: 100%;
+      max-width: 320px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      position: relative;
+    }
+    
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .token-info {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .token-symbol {
+      font-weight: 800;
+      font-size: 1.1rem;
+      letter-spacing: -0.5px;
+    }
+    
+    .token-name {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    
+    .live-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--success);
+    }
+    
+    .live-dot {
+      width: 5px;
+      height: 5px;
+      background: var(--success);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--success);
+      animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.4); opacity: 0.5; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    
+    .price-section {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    
+    .price {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: -1px;
+      color: #fff;
+    }
+    
+    .change {
+      font-size: 0.8rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    
+    .change.up { color: var(--success); }
+    .change.down { color: var(--danger); }
+    
+    .divider {
+      height: 1px;
+      background: var(--border);
+      width: 100%;
+    }
+    
+    .affiliate-btn {
+      background: linear-gradient(135deg, var(--accent), #0099ff);
+      color: #000;
+      border: none;
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      text-align: center;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .affiliate-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 5px 15px rgba(0, 229, 255, 0.2);
+    }
+  </style>
+</head>
+<body>
+
+<div class="widget-card">
+  <div class="header">
+    <div class="token-info">
+      <span class="token-symbol" id="sym-label">BTC</span>
+      <span class="token-name" id="name-label">Bitcoin</span>
+    </div>
+    <div class="live-indicator">
+      <div class="live-dot"></div>
+      Live
+    </div>
+  </div>
+  
+  <div class="price-section">
+    <span class="price" id="price-label">$--,--</span>
+    <span class="change" id="change-label">--%</span>
+  </div>
+  
+  <div class="divider"></div>
+  
+  <a href="https://www.binance.com/activity/referral-entry/CPA?ref=897067319&utm_source=crypto_widget" target="_blank" class="affiliate-btn">
+    Claim $100 Binance Bonus 🚀
+  </a>
+</div>
+
+<script>
+  // Get query params to customize token
+  const urlParams = new URLSearchParams(window.location.search);
+  const token = (urlParams.get('token') || 'BTC').toUpperCase();
+  
+  const tokenNames = {
+    'BTC': 'Bitcoin',
+    'ETH': 'Ethereum',
+    'BNB': 'BNB',
+    'SOL': 'Solana',
+    'ADA': 'Cardano',
+    'XRP': 'Ripple'
+  };
+  
+  document.getElementById('sym-label').innerText = token;
+  document.getElementById('name-label').innerText = tokenNames[token] || 'Crypto Asset';
+  
+  async function fetchPrice() {
+    try {
+      const symbol = `${token}USDT`;
+      const res = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${symbol}`);
+      const data = await res.json();
+      
+      const price = parseFloat(data.lastPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const change = parseFloat(data.priceChangePercent);
+      
+      document.getElementById('price-label').innerText = `$${price}`;
+      
+      const changeEl = document.getElementById('change-label');
+      changeEl.innerHTML = `${change >= 0 ? "▲ +" : "▼ "}${change.toFixed(2)}%`;
+      changeEl.className = `change ${change >= 0 ? 'up' : 'down'}`;
+    } catch (e) {
+      console.warn("Failed to fetch price from Binance.");
+    }
+  }
+  
+  fetchPrice();
+  setInterval(fetchPrice, 10000); // Update every 10 seconds
+</script>
+</body>
+</html>
