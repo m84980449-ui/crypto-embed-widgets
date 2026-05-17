@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CryptoEmbed — Live Premium Embeddable Crypto Widgets</title>
+  <!-- Plus Jakarta Sans Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #030712;
+      --panel: #0b0f19;
+      --border: rgba(255, 255, 255, 0.08);
+      --accent: #00e5ff;
+      --accent2: #7b2fff;
+      --text: #f3f4f6;
+      --muted: #9ca3af;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 3rem 0;
+      background-image: radial-gradient(circle at top, rgba(0, 229, 255, 0.05) 0%, transparent 60%);
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+
+    .logo {
+      font-size: 1.75rem;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 0.5rem;
+    }
+    .logo span {
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    p.subtitle {
+      color: var(--muted);
+      max-width: 550px;
+      margin: 0 auto;
+      font-size: 1rem;
+    }
+
+    /* Generator layout */
+    .generator-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 3rem;
+      align-items: start;
+    }
+    @media (max-width: 768px) {
+      .generator-grid { grid-template-columns: 1fr; gap: 2rem; }
+    }
+
+    .control-panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    label {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--muted);
+    }
+
+    select {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 0.85rem 1rem;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      outline: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    select:focus {
+      border-color: var(--accent);
+    }
+
+    .preview-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .preview-wrapper {
+      background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%);
+      border: 1px dashed rgba(255, 255, 255, 0.15);
+      border-radius: 24px;
+      padding: 3rem;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .code-output {
+      width: 100%;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      position: relative;
+    }
+
+    pre {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      overflow-x: auto;
+      color: var(--accent);
+      white-space: pre-wrap;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      background: var(--text);
+      color: var(--bg);
+      border: none;
+      padding: 0.4rem 1rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .copy-btn:hover {
+      transform: scale(1.05);
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.8rem;
+      margin-top: 6rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div class="logo">Crypto<span>Embed</span></div>
+    <p class="subtitle">Generate gorgeous live price card widgets for your blog, community page, or portfolio site in one click.</p>
+  </header>
+
+  <main class="generator-grid">
+    <!-- Controls -->
+    <div class="control-panel">
+      <div class="form-group">
+        <label for="token-select">Select Asset</label>
+        <select id="token-select" onchange="updateWidget()">
+          <option value="BTC">Bitcoin (BTC)</option>
+          <option value="ETH">Ethereum (ETH)</option>
+          <option value="BNB">BNB (BNB)</option>
+          <option value="SOL">Solana (SOL)</option>
+          <option value="ADA">Cardano (ADA)</option>
+          <option value="XRP">Ripple (XRP)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Embedded Referral Reward</label>
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--accent); background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 0.75rem 1rem; border-radius: 8px;">
+          Binance ID: 897067319 (Active)
+        </div>
+      </div>
+    </div>
+
+    <!-- Preview & Embed Code -->
+    <div class="preview-box">
+      <div class="preview-wrapper">
+        <!-- Widget iframe -->
+        <iframe id="widget-iframe" src="widget.html?token=BTC" width="100%" height="180" style="border: none; max-width: 320px;" scrolling="no"></iframe>
+      </div>
+
+      <div class="code-output">
+        <label style="display:block; margin-bottom: 0.5rem;">Copy Embed Code</label>
+        <button class="copy-btn" onclick="copyCode()">Copy</button>
+        <pre><code id="embed-code">&lt;iframe src="https://m84980449-ui.github.io/crypto-embed-widgets/widget.html?token=BTC" width="100%" height="180" style="border:none; max-width:320px;" scrolling="no"&gt;&lt;/iframe&gt;</code></pre>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>© 2026 CryptoEmbed Tools. Monetized with Binance Affiliates.</p>
+  </footer>
+</div>
+
+<script>
+  function updateWidget() {
+    const token = document.getElementById('token-select').value;
+    const iframe = document.getElementById('widget-iframe');
+    
+    // Update live preview iframe source
+    iframe.src = `widget.html?token=${token}`;
+    
+    // Update copy-paste code text
+    const codeBlock = document.getElementById('embed-code');
+    const embedStr = `<iframe src="https://m84980449-ui.github.io/crypto-embed-widgets/widget.html?token=${token}" width="100%" height="180" style="border:none; max-width:320px;" scrolling="no"></iframe>`;
+    codeBlock.innerText = embedStr;
+  }
+
+  function copyCode() {
+    const codeBlock = document.getElementById('embed-code');
+    navigator.clipboard.writeText(codeBlock.innerText);
+    
+    const copyBtn = document.querySelector('.copy-btn');
+    copyBtn.innerText = 'Copied!';
+    setTimeout(() => { copyBtn.innerText = 'Copy'; }, 2000);
+  }
+</script>
+</body>
+</html>
